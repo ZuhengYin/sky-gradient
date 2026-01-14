@@ -1,0 +1,274 @@
+@font-face {
+    font-family: 'Monument Extended';
+    src: url('MonumentExtended-Ultrabold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+}
+
+:root {
+    --text-color: rgba(255, 255, 255, 0.9);
+    --font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    /* Adaptive UI Tokens (Default: Light Mode) */
+    --ui-bg: rgba(255, 255, 255, 0.1);
+    --ui-border: rgba(255, 255, 255, 0.2);
+    --ui-text: rgba(255, 255, 255, 0.9);
+    --ui-placeholder: rgba(255, 255, 255, 0.6);
+    --ui-hover: rgba(255, 255, 255, 0.25);
+}
+
+body.dark-mode {
+    --ui-bg: rgba(0, 0, 0, 0.6);
+    --ui-border: rgba(255, 255, 255, 0.1);
+    --ui-text: rgba(255, 255, 255, 0.9);
+    --ui-placeholder: rgba(255, 255, 255, 0.5);
+    --ui-hover: rgba(0, 0, 0, 0.8);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-family);
+}
+
+.sky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    /* Behind content */
+    filter: blur(10px);
+    transform: scale(1.25);
+    /* Scale up to hide blurred edges */
+}
+
+/* Ensure canvas is block to avoid scrollbars */
+canvas {
+    display: block;
+}
+
+@keyframes breathe {
+    0% {
+        background-position: 50% 0%;
+    }
+
+    50% {
+        background-position: 50% 100%;
+    }
+
+    100% {
+        background-position: 50% 0%;
+    }
+}
+
+.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-color);
+    z-index: 10;
+    mix-blend-mode: overlay;
+    /* Blends text beautifully with the background */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+
+    /* Prevent selection for better interaction */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+h1 {
+    font-size: 8rem;
+    font-family: 'Monument Extended', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    /* Relaxed kerning so letters don't touch */
+    margin-bottom: 0.5rem;
+
+    /* Liquid Glass Effect */
+    color: rgba(255, 255, 255, 0.15);
+    /* Increased opacity for body */
+    background: linear-gradient(120deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.5) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    /* Depth & Glow */
+    text-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.1),
+        0 0 20px rgba(255, 255, 255, 0.1);
+
+    animation: liquidShine 6s linear infinite;
+    /* Apply SVG Refraction Filter + Existing Glow */
+    filter: url(#glass-glow) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+@keyframes liquidShine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+.colon {
+    position: relative;
+    top: -0.05em;
+    /* Slight vertical shift to center with numbers */
+    margin: 0 0.02em;
+    /* Ensure space around colon */
+    display: inline-block;
+}
+
+p {
+    font-size: 1rem;
+    font-weight: 300;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+/* Search UI */
+.search-container {
+    position: fixed;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    background: var(--ui-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--ui-border);
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    z-index: 100;
+    transition: all 0.3s ease;
+    gap: 8px;
+    position: fixed;
+    /* Ensure parent context for absolute children */
+}
+
+/* Drop-up Suggestions */
+.suggestions-list {
+    position: absolute;
+    bottom: 110%;
+    /* Just above the bar */
+    left: 0;
+    width: 100%;
+    background: rgba(30, 30, 30, 0.6);
+    /* Slightly darker for contrast */
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+    /* Hidden by default */
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.suggestions-list.active {
+    display: block;
+}
+
+.suggestions-list li {
+    padding: 10px 15px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+}
+
+.suggestions-list li:last-child {
+    border-bottom: none;
+}
+
+.suggestions-list li:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.search-container:focus-within {
+    background: var(--ui-hover);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.separator {
+    width: 1px;
+    height: 16px;
+    background: var(--ui-border);
+}
+
+#location-input {
+    background: transparent;
+    border: none;
+    color: var(--ui-text);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    padding: 0 0.5rem;
+    width: 110px;
+    /* Smaller width */
+    outline: none;
+}
+
+#location-input::placeholder {
+    color: var(--ui-placeholder);
+}
+
+#search-btn,
+#locate-btn,
+#music-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--ui-text);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+#search-btn:hover,
+#locate-btn:hover,
+#music-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#music-btn.active {
+    opacity: 1;
+    color: var(--text-color);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

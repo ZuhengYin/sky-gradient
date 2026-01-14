@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Gradient</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+
+<body>
+    <!-- SVG Filters for Glass Effect -->
+    <svg style="width:0;height:0;position:absolute;">
+        <filter id="glass-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <!-- Create a height map from the alpha channel -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+
+            <!-- Use lighting to create the bevel/thickness look -->
+            <feSpecularLighting in="blur" surfaceScale="5" specularConstant="1" specularExponent="20"
+                lighting-color="white" result="specOut">
+                <fePointLight x="-5000" y="-10000" z="20000" />
+            </feSpecularLighting>
+
+            <!-- Compose the light on top of the text -->
+            <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut" />
+            <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"
+                result="litPaint" />
+        </filter>
+    </svg>
+
+    <div id="sky" class="sky"></div>
+    <div class="content">
+        <h1 id="time-display">Detecting Location...</h1>
+        <p id="status-display">Please allow location access to synchronize with the sky.</p>
+    </div>
+
+    <!-- Search UI -->
+    <div class="search-container">
+        <ul id="suggestions" class="suggestions-list"></ul>
+        <button id="music-btn" title="Toggle Lo-Fi Radio">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                <path
+                    d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z">
+                </path>
+            </svg>
+        </button>
+        <div class="separator"></div>
+        <button id="locate-btn" title="Use My Location">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+        </button>
+        <div class="separator"></div>
+        <input type="text" id="location-input" placeholder="Search City..." autocomplete="off">
+        <button id="search-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </button>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
