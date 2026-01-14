@@ -16,6 +16,7 @@ let locationFound = false;
 let searchTimeout = null; // For debouncing
 // Music
 let audio = new Audio('http://radio.stereoscenic.com/asp-s');
+audio.preload = 'none'; // Prevent blocking load
 let isPlaying = false;
 
 // Time & State
@@ -28,24 +29,14 @@ function setup() {
     // Create full screen canvas
     let cnv = createCanvas(windowWidth, windowHeight);
     cnv.parent('sky');
-    noStroke();
+    // Mobile Optimization (Broadened for tablets/landscape)
+    if (windowWidth < 1024) {
+        pixelDensity(1); // Crucial for performance on high-DPI phones
+        frameRate(30);   // Cap framerate
+    }
 
-    // Define Colors
-    PALETTE = {
-        deepBlue: color('#2b32b2'),
-        softBlack: color('#0c0c0cff'),
-        purple: color('#364F6B'), // Muted Deep Ocean Blue
-        lightPink: color('#F2CED8'),
-        beige: color('#F2D3AC'),
-        softWhite: color('#89d0ffff'),
-        veryPaleBlue: color('#E0EAFC'),
-        lavender: color('#E0C3FC'),
-        softBlue: color('#8EC5FC'),
-        salmon: color('#F2A7A0'),
-        hotPink: color('#F2BBD9'),
-        mutedNavy: color('#4b6cb7'),
-        darkPurple: color('#182848')
-    };
+    // UI Event Listeners
+
 
     // UI Event Listeners
     searchBtn.addEventListener('click', () => {
@@ -215,7 +206,8 @@ function draw() {
 
     let colors = getGenerativeColors(currentSolarState);
     updateTheme(colors); // Adaptive UI
-    drawGenerativeGradient(colors);
+    // drawGenerativeGradient(colors); // Disabled for performance
+    background(colors.mid); // Simple static background to preserve color vibe
 
     // 4. Draw Interactive Trails
     drawInteractiveTrails(colors);
@@ -315,13 +307,18 @@ function drawInteractiveTrails(colors) {
         let size = map(age, 0, 2500, 25, 200); // Expand ripple (Start smaller)
 
         // Calculate "Displaced" color (Ripple Effect)
-        // We take color from Y + Offset
-        let rippleOffset = 0.15;
-        let sampleY = p.y / height + rippleOffset;
-        if (sampleY > 1) sampleY -= 1; // Wrap or clamping
-        sampleY = constrain(sampleY, 0, 1);
-
-        let c = getColorAtProportion(sampleY, colors, stop1, stop2, stop3);
+        // Optimization: On mobile, skip the expensive color lerping for ripples
+        let c;
+        if (windowWidth < 1024) {
+            c = color(255, 255, 255); // Simple white ripple
+        } else {
+            // We take color from Y + Offset
+            let rippleOffset = 0.15;
+            let sampleY = p.y / height + rippleOffset;
+            if (sampleY > 1) sampleY -= 1; // Wrap or clamping
+            sampleY = constrain(sampleY, 0, 1);
+            c = getColorAtProportion(sampleY, colors, stop1, stop2, stop3);
+        }
 
         noStroke();
         c.setAlpha(opacity);

@@ -90,7 +90,8 @@ canvas {
 }
 
 h1 {
-    font-size: 8rem;
+    font-size: 4.5rem;
+    /* Scaled down ~50% from 8rem */
     font-family: 'Monument Extended', sans-serif;
     font-weight: 800;
     text-transform: uppercase;
@@ -115,8 +116,8 @@ h1 {
         0 0 20px rgba(255, 255, 255, 0.1);
 
     animation: liquidShine 6s linear infinite;
-    /* Apply SVG Refraction Filter + Existing Glow */
-    filter: url(#glass-glow) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    /* Removed heavy SVG Refraction for performance */
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
 }
 
 @keyframes liquidShine {
@@ -270,5 +271,37 @@ p {
 
     100% {
         transform: scale(1);
+    }
+}
+
+/* Mobile Optimization */
+@media (max-width: 1024px) {
+    h1 {
+        font-size: 9vw;
+        /* Slightly smaller for mobile */
+        letter-spacing: -1px;
+        /* Disable heavy SVG filter on mobile */
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        /* Simplify background gradient */
+        background-size: 100% auto;
+        animation: none;
+        /* Disable liquid shine animation */
+        color: rgba(255, 255, 255, 0.8);
+        /* Solid color fallback */
+    }
+
+    .colon {
+        top: -0.02em;
+        margin: 0;
+    }
+
+    .search-container {
+        bottom: 2rem;
+        width: 90%;
+        justify-content: space-between;
+    }
+
+    #location-input {
+        width: 100%;
     }
 }
